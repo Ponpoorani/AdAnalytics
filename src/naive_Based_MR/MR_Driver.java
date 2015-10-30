@@ -1,14 +1,5 @@
 package naive_Based_MR;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Properties;
-
 import org.apache.hadoop.conf.Configuration;
 import org.apache.hadoop.fs.Path;
 import org.apache.hadoop.io.IntWritable;
@@ -25,28 +16,23 @@ import org.apache.hadoop.util.ToolRunner;
 public class MR_Driver implements Tool{
 	Configuration conf = null;
 	
-	public static void main(String[] args) throws Exception {
-		Properties props=new Properties();
-		int result = ToolRunner.run(new MR_Driver(), args);
-		System.exit(result);
-
-	}
-	
-	
 	public int run(String[] args) throws Exception {
 		// Check for valid number of arguments.
-		if (args.length < 1) {
+		if (args.length < 3) {
 			System.err.println("*** Error: Missing Parameters *** \n " +
-									   "Usage: hadoop Driver <output_path>");
+									   "Usage: hadoop Driver <input_path> <output_path> <log_type>");
 			System.exit(-1);
 		}
 		long start=System.nanoTime();
 		Configuration conf = getConf();
-		 
+		conf.set("log_type", args[2]);
+		
 		/**
 		 * Create a new job object and set the output types of the Map and Reduce function.
 		 * Also set Mapper and Reducer classes.
 		 */
+		
+		@SuppressWarnings("deprecation")
 		Job job = new Job(conf, "ETL MR");
 		job.setJarByClass(MR_Driver.class);
 		job.setMapperClass(MR_mapper.class);
@@ -78,5 +64,10 @@ public class MR_Driver implements Tool{
 
 	@Override
 	public void setConf(Configuration arg0) {}
+	
+	public static void main(String[] args) throws Exception {
+		int result = ToolRunner.run(new MR_Driver(), args);
+		System.exit(result);
+	}
 
 }
